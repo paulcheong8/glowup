@@ -24,10 +24,10 @@
                 >
                 <v-chip 
                     small
-                    :class="`${post.selectedCategory} ma-2`"     
-                    @click="categorySearch(post.selectedCategory)"      
+                    :class="`${post.category} ma-2`"     
+                    @click="categorySearch(post.category)"      
                 >
-                    {{post.selectedCategory}}
+                    {{post.category}}
                 </v-chip>
                 </v-chip-group>
             </v-card-text>

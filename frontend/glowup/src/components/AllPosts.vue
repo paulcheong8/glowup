@@ -74,10 +74,10 @@
                   >
                     <v-chip 
                       small                
-                      :class="`${post.selectedCategory} ma-2`"     
-                      @click="categorySearch(post.selectedCategory)"      
+                      :class="`${post.category} ma-2`"     
+                      @click="categorySearch(post.category)"      
                     >
-                      {{post.selectedCategory}}
+                      {{post.category}}
                     </v-chip>
                   </v-chip-group>
                 </v-card-text>
@@ -171,7 +171,7 @@ export default {
         else {
           this.updatedPosts = []
           this.posts.forEach(post => {
-            if (parsedobj.includes(post.selectedCategory)) {
+            if (parsedobj.includes(post.category)) {
                 this.updatedPosts.push(post)
             }
           })     

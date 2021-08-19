@@ -173,7 +173,7 @@
                         required
                         color="amber darken-1"
                       ></v-text-field>
-                    </v-col>
+                    </v-col>                   
                     
                     <v-col
                       cols="12"
@@ -186,6 +186,19 @@
                         color="amber darken-1"
                       ></v-text-field>
                     </v-col>
+
+                    <v-col
+                      cols="12"
+                    >
+                      <v-text-field
+                        v-model= "organisation"
+                        :rules="nicknameRules"
+                        :counter="15"
+                        label="Organisation"
+                        required
+                        color="amber darken-1"
+                      ></v-text-field>
+                    </v-col> 
 
                     <v-col cols="12">
                       <v-text-field
@@ -295,6 +308,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   data: () => ({
     loginDialog: false,
@@ -304,6 +319,7 @@ export default {
     showSignupConfirmPassword: false,
     nickname: "",
     email: "",
+    organisation: "",
     password: "",
     confirmPassword: "",
     valid: true,
@@ -355,8 +371,17 @@ export default {
     },
 
     signup: function() {
-      console.log(this.password)
-      console.log(this.email)
+      let userObj = {
+        nickname: this.nickname,
+        email: this.email,
+        organisation: this.organisation,
+        password: this.password
+      }
+      let url = 'http://localhost:80/createuser/'
+      axios.post(
+        url, 
+        userObj
+      )
       this.signupDialog = false;
     },
 

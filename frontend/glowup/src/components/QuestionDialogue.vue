@@ -72,7 +72,7 @@
                       >
                       </v-textarea>
                     </v-col>
-                    <v-col cols="12">
+                    <!-- <v-col cols="12">
                       <v-text-field
                         v-model="organisation"
                         :rules="formRules"
@@ -80,7 +80,7 @@
                         required
                         color="amber darken-1"
                       ></v-text-field>
-                    </v-col>
+                    </v-col> -->
                     <v-col
                       cols="12"
                       sm="6"
@@ -125,6 +125,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   props: ['posts'],
   data: function () {
@@ -134,7 +136,6 @@ export default {
       nickname: "",
       title: "",
       advice: "",
-      organisation: "",
       selectedCategory: "",     
       formRules: [
         v => !!v || 'This field is required',
@@ -147,10 +148,8 @@ export default {
 
   methods: {
       getAdviceQuery: function() {
-        let adviceObj = {}
-        adviceObj = {
+        let adviceObj = {
           nickname: this.nickname,
-          organisation: this.organisation,
           timePosted: "1d ago",
           selectedCategory: this.selectedCategory,
           title: this.title,
@@ -159,6 +158,21 @@ export default {
           numComments: 20,
           datetime: new Date().getTime()
         }
+
+        let url = 'http://localhost:80/createpost/'
+        axios.post(
+          url,
+          adviceObj,
+          { headers: {
+              "Content-Type": "application/json",
+              // 'Access-Control-Allow-Origin': '*',
+              // "Access-Control-Allow-Methods": "*",
+              // "Access-Control-Allow-Headers": "*",
+              } 
+          }
+        )
+        .then(response => console.log(response.status))
+
         this.posts.push(adviceObj)
         this.dialog = false;
       },      
