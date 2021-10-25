@@ -86,7 +86,7 @@
               <span class="mx-4 subheading" style="font-size:14px">{{post.nickname}} | {{post.organisation}}</span>
 
               <v-card-title class="text--primary">
-                  {{post.advice | limitString(150)}}
+                  {{post.title | limitString(150)}}
               </v-card-title>
 
               <v-card-text>
@@ -135,6 +135,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   props: ['udpatedPosts', 'posts'],
   data: () => ({
@@ -148,12 +150,24 @@ export default {
     async mounted() {
       this.updatedPosts = this.posts
       this.sortBy()
-      let date = ""
-      date = new Date().getTime()
-      console.log(date)
     },  
   methods: {
+      addViewCount: function(post) {
+        let viewObj = {
+          post_id: post.post_id,
+          user_id: 1
+        }
+        let config = {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS'
+          }
+        }
+        axios.post('http://localhost:80/createview/', viewObj, config)
+      },
+
       postSearch: function(post) {
+        this.addViewCount(post)
         this.$router.push({ path: "/post", query: {post: post}})
       },
       categorySearch: function(category) {
@@ -180,11 +194,13 @@ export default {
 
       sortBy: function() {
         if (this.sort == "popular") {
-          this.updatedPosts.sort((a, b) => b.datetime.toString().localeCompare(a.datetime))
+          this.updatedPosts.sort((a, b) => b.created_date.toString().localeCompare(a.created_date))
         } else {
           this.updatedPosts.sort((a, b) => b.numViews.toString().localeCompare(a.numViews))
         }
       },      
+
+      
   },
     filters: {
 

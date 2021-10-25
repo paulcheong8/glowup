@@ -13,10 +13,10 @@
                 <div>
                 <v-chip 
                     small
-                    :class="`${post.selectedCategory} ma-2`"     
-                    @click="categorySearch(post.selectedCategory)"      
+                    :class="`${post.category} ma-2`"     
+                    @click="categorySearch(post.category)"      
                 >
-                    {{post.selectedCategory}}
+                    {{post.category}}
                 </v-chip>
                 </div>
             </v-card-subtitle>
@@ -62,6 +62,14 @@
             <v-divider></v-divider>
 
             <v-container>
+
+                <v-text-field
+                  v-model= "nickname"
+                  label="Nickname"
+                  required
+                  color="amber darken-1"
+                ></v-text-field>
+
                 <v-textarea
                     v-model= "comment"
                     name="input-7-1-4"
@@ -156,36 +164,40 @@
 </template>
 
 <script>
+import axios from 'axios'
 
 export default {
   name: 'search',
   data() {
     return {
       post: {},
+      nickname: "",
       comment: "",
+      // liked: false,
       formRules: [
         v => !!v || 'This field is required',
       ],      
-      comments: [
-        {
-          nickname: "bunny",
-          comment: "I feel that maybe you should look into what are your interests. See what aligns with it and move into that area",
-          organisation: "SMU",
-          timePosted: "1d ago",     
-          numLikes: 12,
-          numComments: 0,
-          liked: false      
-        },
-        {
-          nickname: "moosey",
-          comment: "Think about what you like and whether you can see yourself doing it for the next few years. Remember not to choose based on salary as well.",
-          organisation: "SMU",
-          timePosted: "1d ago",     
-          numLikes: 15,
-          numComments: 0,
-          liked: false      
-        }        
-      ]
+      comments: [],
+      // comments: [
+      //   {
+      //     nickname: "bunny",
+      //     comment: "I feel that maybe you should look into what are your interests. See what aligns with it and move into that area",
+      //     organisation: "SMU",
+      //     timePosted: "1d ago",     
+      //     numLikes: 12,
+      //     numComments: 0,
+      //     // liked: false
+      //   },
+      //   {
+      //     nickname: "moosey",
+      //     comment: "Think about what you like and whether you can see yourself doing it for the next few years. Remember not to choose based on salary as well.",
+      //     organisation: "SMU",
+      //     timePosted: "1d ago",     
+      //     numLikes: 15,
+      //     numComments: 0,
+      //     // liked: false      
+      //   }        
+      // ]
     }
   },
   methods: {
@@ -196,14 +208,15 @@ export default {
         let commentObj = {}
         console.log(this.comment)
         commentObj = {
-          nickname: "monkey",
+          post_id: this.post.post_id,
+          nickname: this.nickname,
           comment: this.comment,
-          organisation: "NTU",
-          timePosted: "1d ago",
-          numLikes: 0,
-          numComments: 0,
-          liked: false
+          // organisation: "NTU",
+        //  timePosted: "1d ago",
+          // numLikes: 0,
+          // numComments: 0,
         }
+        axios.post('http://localhost:80/createcomment/', commentObj)
         this.comments.push(commentObj)
         console.log(commentObj)
       },
@@ -211,6 +224,11 @@ export default {
       likeComment: function(c) {
         if (!c.liked) {
           c.numLikes += 1
+          // let likeObj = {
+          //   comment_id: c.comment_id,
+          //   user_id: 1
+          // }
+          // axios.post('http://localhost:80/createlike/', likeObj)
         } else {
           c.numLikes -= 1
         }
@@ -222,6 +240,16 @@ export default {
   async mounted() {
     try {
         this.post = this.$route.query.post
+        axios.get('http://localhost:80/getcomments', {
+          params: {
+            post_id: this.post.post_id
+          }
+        }).then(response => {
+          for (let obj of response.data.comments) {
+            this.comments.push(obj)
+          }
+        })
+        console.log(this.comments)
     }
     catch (e) {console.log(e)}
   } 

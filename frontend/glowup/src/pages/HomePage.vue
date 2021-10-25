@@ -26,6 +26,7 @@ import Trending from '../components/Trending.vue'
 import AllPosts from '../components/AllPosts.vue'
 import axios from 'axios'
 
+
 export default {
   name: "HomePage",
   components: {
@@ -33,61 +34,43 @@ export default {
     Trending,
     AllPosts
   },
-  data: () => ({       
-    trendingPosts: [
-      {
-        nickname: "hippo",
-        organisation: "SMU",
-        timePosted: "1d ago",
-        category: "Technology",
-        title: "Advice on career path",
-        advice: "I am deciding whether to continue being a software engineer or going into something else..",
-        numViews: 200,
-        numComments: 20
-      },
-      {
-        nickname: "monkey",
-        organisation: "NUS",
-        timePosted: "1w ago",
-        category: "Career",
-        title: "Is ABC Company good?",
-        advice: "I got an offer from ABC but I am wondering if it is worth going there to start a career.",
-        numViews: 256,
-        numComments: 45
-      },
-      {
-        nickname: "ducky",
-        organisation: "NTU",
-        timePosted: "3mth ago",
-        category: "Career",
-        title: "Tips on getting into X company",
-        advice: "Anyone knows what kind of experience X company is looking for?",
-        numViews: 456,
-        numComments: 50
-      },               
+  data() {
+    return {
+    // trendingPosts: [
+    //   {
+    //     nickname: "hippo",
+    //     organisation: "SMU",
+    //     timePosted: "1d ago",
+    //     category: "Technology",
+    //     title: "Advice on career path",
+    //     advice: "I am deciding whether to continue being a software engineer or going into something else..",
+    //     numViews: 200,
+    //     numComments: 20
+    //   },
+    //   {
+    //     nickname: "monkey",
+    //     organisation: "NUS",
+    //     timePosted: "1w ago",
+    //     category: "Career",
+    //     title: "Is ABC Company good?",
+    //     advice: "I got an offer from ABC but I am wondering if it is worth going there to start a career.",
+    //     numViews: 256,
+    //     numComments: 45
+    //   },
+    //   {
+    //     nickname: "ducky",
+    //     organisation: "NTU",
+    //     timePosted: "3mth ago",
+    //     category: "Career",
+    //     title: "Tips on getting into X company",
+    //     advice: "Anyone knows what kind of experience X company is looking for?",
+    //     numViews: 456,
+    //     numComments: 50
+    //   },               
                       
-    ],
+    // ],
     posts: [],
-     
-    updatedPosts: [],
-    sort: "",
-  }),
-
-
-  async created() {
-    this.posts = await this.getPosts()
-    this.posts = JSON.parse(JSON.stringify(this.posts.data.posts))
-    // console.log(JSON.parse(JSON.stringify(this.posts.data.posts)))
-  },
-
-  methods: {
-    getPosts: async() => {
-      let url = 'http://localhost:80/getposts'
-      return await axios.get(url)
-        
-    }
-  }
-
+    trendingPosts: [],
     // posts: [
     //   {
     //     nickname: "hippo",
@@ -145,7 +128,37 @@ export default {
     //     numComments: 50,
     //     datetime: 1627200240296
     //   },                  
-    // ], 
+    // ],      
+    updatedPosts: [],
+    sort: "",
+    }       
+
+  },
+
+  mounted: function() {
+    // var StatsD = require('hot-shots');
+    // var dogstatsd = new StatsD();
+
+    // // Increment a counter.
+    // dogstatsd.increment('page.views')    
+
+    let config = {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS'
+      }
+    }
+
+    axios.get('http://localhost:80/getposts', config)
+    .then(response => {
+      for (let obj of response.data.posts) {
+        this.posts.push(obj)
+        if (this.trendingPosts.length < 3) {
+          this.trendingPosts.push(obj)
+        }
+      }
+    })
+  }
 
 
 }

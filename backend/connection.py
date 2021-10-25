@@ -78,6 +78,25 @@ class Postgres(object):
              print("post created")
              return
 
+    # create comment
+    def create_comment(self, comment_object):
+        post_id = comment_object['post_id']
+        nickname = comment_object['nickname']
+        print(nickname)
+        user_id = self.get_user_id(nickname)
+        print(user_id)
+        comment = comment_object['comment']   
+        query = "insert into public.comments (post_id, user_id, comment) values ({}, {}, '{}')".format(post_id, user_id, comment)
+        try:
+            self.cursor.execute(query)
+            self.connection.commit()
+        except Exception as error:
+            print('error executing query "{}", error:{}'.format(query, error))
+            return None
+        else:
+             print("comment created")
+             return             
+
     # create view
     def create_view(self, view_object):
         post_id = view_object['post_id']
@@ -92,6 +111,20 @@ class Postgres(object):
         else:
              print("view created")
              return        
+
+    def create_like(self, like_object):
+        comment_id = like_object['comment_id']
+        user_id = like_object['user_id']
+        query = "insert into public.likes (user_id, comment_id) values ({}, '{}')".format(user_id, comment_id)
+        try:
+            self.cursor.execute(query)
+            self.connection.commit()
+        except Exception as error:
+            print('error executing query "{}", error:{}'.format(query, error))
+            return None
+        else:
+             print("like created")
+             return              
 
     # create user
     def create_user(self, user_object):
@@ -109,6 +142,10 @@ class Postgres(object):
         else:
              print("view created")
              return             
+
+    # login 
+    def login(self, login_object):
+        return
 
     # read posts
     def get_posts(self, post_id = None):
@@ -133,14 +170,16 @@ class Postgres(object):
                         on p.post_id=b.post_id
                         left join 
                         (select post_id, count(*) as num_comments from public.comments group by post_id) as c
-                        on p.post_id=c.post_id'''
+                        on p.post_id=c.post_id
+                        order by num_views asc
+                        '''
         try:
             self.cursor.execute(query)
             results = self.cursor.fetchall()
             posts = []
             for result in results:
                 created_date = result[7]
-
+                timestamp = datetime.timestamp(created_date)
                 # created_date = created_date[5:25]
                 # created_date_object = datetime.strptime(created_date, "%d %b %Y %H:%M:%S")
                 # time_diff = abs((datetime.now() - created_date_object))
@@ -154,8 +193,12 @@ class Postgres(object):
                 elif time_diff.seconds > 3600: 
                     time_posted = time_diff.seconds // 3600 
                     time_posted = str(time_posted) + "h"
-                else: 
+                elif time_diff.seconds > 60: 
                     time_posted = time_diff.seconds // 60
+                    time_posted = str(time_posted) + "min"
+                else: 
+                    time_posted = time_diff.seconds 
+                    time_posted = str(time_posted) + "s"
 
                 post = {
                     "post_id": result[0],
@@ -165,7 +208,7 @@ class Postgres(object):
                     "title": result[4],
                     "advice": result[5],
                     "category": result[6],
-                    # "created_date": result[7],
+                    "created_date": timestamp,
                     "numViews": result[8],
                     "numComments": result[9],
                     "timePosted": time_posted
@@ -178,3 +221,61 @@ class Postgres(object):
         else:
             # return jsonify({'posts': posts})
             return posts
+
+
+    # read posts
+    def get_comments(self, post_id):
+        query = '''
+            select comment_id, post_id, c.user_id, comment_reply_id, c.created_date, comment, nickname, organisation 
+            from public.comments c
+            inner join
+            public.users u on c.user_id=u.user_id
+            where post_id={}      
+            order by created_date desc
+        '''.format(post_id)
+
+        try:
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()
+            comments = []
+            for result in results:
+                created_date = result[4]
+                timestamp = datetime.timestamp(created_date)
+                time_diff = abs((datetime.now() - created_date))
+                time_posted = 0
+
+                # if more than a day, show DD Mmm
+                if time_diff.days > 0: 
+                    time_posted = created_date.strftime("%d %b, %Y")
+                # if more than 59min, show h
+                elif time_diff.seconds > 3600: 
+                    time_posted = time_diff.seconds // 3600 
+                    time_posted = str(time_posted) + "h"
+                elif time_diff.seconds > 60: 
+                    time_posted = time_diff.seconds // 60
+                    time_posted = str(time_posted) + "min"
+                else: 
+                    time_posted = time_diff.seconds 
+                    time_posted = str(time_posted) + "s"
+
+                comment = {
+                    "comment_id": result[0],
+                    "post_id": result[1],
+                    "user_id": result[2],
+                    "comment_reply_id": result[3],
+                    "comment": result[5],
+                    "nickname": result[6],
+                    "organisation": result[7],
+                    "created_date": timestamp,
+                    # "numViews": result[8],
+                    # "numComments": result[9],
+                    "timePosted": time_posted
+                }
+                comments.append(comment)
+
+        except Exception as error:
+            print('error executing query "{}", error:{}'.format(query, error))
+            return None
+        else:
+            # return jsonify({'posts': posts})
+            return comments
