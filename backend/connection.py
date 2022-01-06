@@ -2,14 +2,26 @@ import psycopg2
 from datetime import datetime, time
 from flask import jsonify
 
+import logging
+import json_log_formatter
+
+formatter = json_log_formatter.JSONFormatter()
+
+json_handler = logging.FileHandler(filename='/var/log/my-log.json')
+json_handler.setFormatter(formatter)
+
+logger = logging.getLogger('my_json')
+logger.addHandler(json_handler)
+logger.setLevel(logging.INFO)
+
 class Postgres(object):
     _instance = None
 
     def __new__(cls):
         if (cls._instance is None):
             cls._instance = object.__new__(cls)
-            dbname = "glowup_db"
-            host = "localhost"
+            dbname = "glowupdb"
+            host = "ec2-44-197-226-89.compute-1.amazonaws.com"
             password = "password"
             port = "5432"
             user="postgres"
@@ -21,13 +33,16 @@ class Postgres(object):
                 "user": user,
             }
             try: 
+                logger.info("connecting to db")
                 print("connecting to db")
                 connection = Postgres._instance.connection = psycopg2.connect(**db_config)
                 cursor = Postgres._instance.cursor = connection.cursor()
             except Exception as error:
+                logger.info("Error: connection not established {}".format(error))
                 print("Error: connection not established {}".format(error))
                 Postgres._instance = None
             else:
+                logger.info("connection established")
                 print("connection established")
 
         return cls._instance
@@ -132,6 +147,7 @@ class Postgres(object):
         email = user_object['email']
         organisation = user_object['organisation']
         password = user_object['password']
+        print(password)
         query = "insert into public.users (nickname, email, organisation, password) values ('{}', '{}', '{}', crypt('{}', gen_salt('bf')))".format(nickname, email, organisation, password)
         try:
             self.cursor.execute(query)
@@ -150,7 +166,7 @@ class Postgres(object):
     # read posts
     def get_posts(self, post_id = None):
         if post_id != None:
-            query = '''select p.post_id, p.user_id, nickname, organisation, title, advice, category, p.created_date, coalesce(b.num_views, 0), coalesce(c.num_comments, 0)
+            query = '''select p.post_id, p.user_id, nickname, organisation, title, advice, category, p.created_date, coalesce(b.num_views, 0) num_views, coalesce(c.num_comments, 0) num_comments
                         from public.users u 
                         inner join 
                         public.posts p on u.user_id = p.user_id
