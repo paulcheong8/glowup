@@ -4,8 +4,13 @@ import json_log_formatter
 import connection
 from connection import Postgres
 import requests
+from flask_cors import CORS, cross_origin
+
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+
 
 formatter = json_log_formatter.JSONFormatter()
 
@@ -19,6 +24,7 @@ logger.setLevel(logging.INFO)
 db = Postgres()
 
 @app.route('/')
+@cross_origin()
 def hello_world():
     nickname = db.get_username(1)
     print("this is the nickname: ", nickname)
@@ -46,6 +52,7 @@ def hello_world():
 #     return "Test endpoint"
 
 @app.route('/external_api')
+@cross_origin()
 def external_api_endpoint():
     # app.logger.info("Testing external api endpoint.........")
     response = requests.get("https://anapioficeandfire.com/api/books/1")
@@ -53,6 +60,7 @@ def external_api_endpoint():
 
 # create post
 @app.route("/createpost/", methods=['POST'])
+@cross_origin()
 def create_post():
     try:
         post_object = request.json
@@ -65,6 +73,7 @@ def create_post():
 
 # create comment
 @app.route("/createcomment/", methods=['POST'])
+@cross_origin()
 def create_comment():
     try:
         comment_object = request.json
@@ -78,6 +87,7 @@ def create_comment():
 # create view
 # request body will contain post_id and user_id in json object 
 @app.route("/createview/", methods=['POST'])
+@cross_origin()
 def create_view():
     try:
         view_object = request.json
@@ -90,6 +100,7 @@ def create_view():
 
 # create user 
 @app.route("/createuser/", methods=['POST'])
+@cross_origin()
 def create_user(): 
     try:
         user_obj = request.json
@@ -102,6 +113,7 @@ def create_user():
     
 # login
 @app.route("/login", methods=['POST'])
+@cross_origin()
 def login(): 
     login_obj = request.json
 
@@ -109,6 +121,7 @@ def login():
 
 # read posts
 @app.route("/getposts", methods=['GET'])
+@cross_origin()
 def get_posts():
     try:
         post_id = request.args.get('post_id')
@@ -122,6 +135,7 @@ def get_posts():
 
 # read posts
 @app.route("/getcomments", methods=['GET'])
+@cross_origin()
 def get_comments():
     try:
         post_id = request.args.get('post_id')
