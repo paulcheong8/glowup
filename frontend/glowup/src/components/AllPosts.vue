@@ -163,7 +163,7 @@ export default {
             'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS'
           }
         }
-        axios.post('http://localhost:80/createview/', viewObj, config)
+        axios.post('http://ec2-3-237-88-193.compute-1.amazonaws.com/createview/', viewObj, config)
       },
 
       postSearch: function(post) {

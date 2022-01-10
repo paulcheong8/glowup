@@ -149,7 +149,7 @@ export default {
       }
     }
 
-    axios.get('http://localhost:80/getposts', config)
+    axios.get('http://ec2-3-237-88-193.compute-1.amazonaws.com/getposts', config)
     .then(response => {
       for (let obj of response.data.posts) {
         this.posts.push(obj)

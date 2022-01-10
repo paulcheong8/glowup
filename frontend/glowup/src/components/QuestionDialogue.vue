@@ -159,7 +159,7 @@ export default {
           datetime: new Date().getTime()
         }
 
-        let url = 'http://localhost:80/createpost/'
+        let url = 'http://ec2-3-237-88-193.compute-1.amazonaws.com/createpost/'
         axios.post(
           url,
           adviceObj,
