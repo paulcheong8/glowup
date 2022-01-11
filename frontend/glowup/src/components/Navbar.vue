@@ -377,7 +377,7 @@ export default {
         organisation: this.organisation,
         password: this.password
       }
-      let url = 'http://ec2-3-237-88-193.compute-1.amazonaws.com/createuser/'
+      let url = 'http://ec2-3-237-88-193.compute-1.amazonaws.com:8000/createuser/'
       axios.post(
         url, 
         userObj
