@@ -3,22 +3,22 @@ import App from './App.vue'
 import vuetify from './plugins/vuetify'
 import router from './router'
 import axios from 'axios'
-import { datadogRum } from '@datadog/browser-rum';
+// import { datadogRum } from '@datadog/browser-rum';
 // import winston from 'winston'
 
 
-datadogRum.init({
-    applicationId: 'bfeef476-f116-4c90-8bdb-af0aebcbf26d',
-    clientToken: 'pubecd3807f431c63820fa1a77ecaa757f3',
-    site: 'datadoghq.com',
-    service:'vue',
-    env:'staging',
-    // Specify a version number to identify the deployed version of your application in Datadog 
-    // version: '1.0.0',
-    sampleRate: 100,
-    trackInteractions: true,
-    allowedTracingOrigins: ["http://localhost"]
-});
+// datadogRum.init({
+//     applicationId: 'bfeef476-f116-4c90-8bdb-af0aebcbf26d',
+//     clientToken: 'pubecd3807f431c63820fa1a77ecaa757f3',
+//     site: 'datadoghq.com',
+//     service:'vue',
+//     env:'staging',
+//     // Specify a version number to identify the deployed version of your application in Datadog 
+//     // version: '1.0.0',
+//     sampleRate: 100,
+//     trackInteractions: true,
+//     allowedTracingOrigins: ["http://localhost"]
+// });
 
 
 // const logger = winston.createLogger({

@@ -216,7 +216,7 @@ export default {
           // numLikes: 0,
           // numComments: 0,
         }
-        axios.post('http://ec2-3-237-88-193.compute-1.amazonaws.com/createcomment/', commentObj)
+        axios.post('http://ec2-3-237-88-193.compute-1.amazonaws.com:8000/createcomment/', commentObj)
         this.comments.push(commentObj)
         console.log(commentObj)
       },
@@ -240,7 +240,7 @@ export default {
   async mounted() {
     try {
         this.post = this.$route.query.post
-        axios.get('http://ec2-3-237-88-193.compute-1.amazonaws.com/getcomments', {
+        axios.get('http://ec2-3-237-88-193.compute-1.amazonaws.com:8000/getcomments', {
           params: {
             post_id: this.post.post_id
           }
